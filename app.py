@@ -10,10 +10,14 @@ from aws_cdk import core as cdk
 from aws_cdk import core
 
 from cdk_service_catalog.cdk_service_catalog_stack import CdkServiceCatalogStack
-
+from pipeline.pipeline import PipelineStack
 
 app = core.App()
-CdkServiceCatalogStack(app, "CdkServiceCatalogStack",
+PipelineStack(app, "PipelineStack", 
+    env=cdk.Environment(account="703965850448", region="eu-west-1")
+)
+
+#CdkServiceCatalogStack(app, "CdkServiceCatalogStack",
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.
@@ -29,6 +33,6 @@ CdkServiceCatalogStack(app, "CdkServiceCatalogStack",
     #env=core.Environment(account='123456789012', region='us-east-1'),
 
     # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
-    )
+ #   )
 
 app.synth()
