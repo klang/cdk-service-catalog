@@ -73,3 +73,30 @@ Enjoy!
 (END)
 
 
+# trust
+
+https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.pipelines/README.html#context-lookups
+
+    cdk bootstrap --trust-for-lookup=703965850448
+    
+    export CDK_NEW_BOOTSTRAP=1
+    cdk bootstrap --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess aws://703965850448/eu-west-1
+
+        pipeline =  CodePipeline(self, "Pipeline", 
+                        pipeline_name="ServiceCatalog",
+                        synth=CodeBuildStep("Synth",                                     
+                            #input=CodePipelineSource.git_hub("klang/cdk-service-catalog", "master"),
+                            input=CodePipelineSource.code_commit(repository=Repository.from_repository_name(self, id="repository", repository_name="cdk-service-catalog"),
+                            branch="master",
+                            
+                            code_build_clone_output=True),
+                            commands=["npm install -g aws-cdk", 
+                                "python -m pip install -r requirements.txt", 
+                                "cdk synth"]
+                        )
+                    )
+
+
+
+
+
