@@ -56,3 +56,20 @@ command.
  * `cdk docs`        open CDK documentation
 
 Enjoy!
+
+
+{
+    "repositoryMetadata": {
+        "accountId": "703965850448",
+        "repositoryId": "3e5e1326-cae6-43e5-b444-a69270e0aa94",
+        "repositoryName": "cdk-service-catalog",
+        "lastModifiedDate": "2021-10-07T16:13:19.347000+02:00",
+        "creationDate": "2021-10-07T16:13:19.347000+02:00",
+        "cloneUrlHttp": "https://git-codecommit.eu-west-1.amazonaws.com/v1/repos/cdk-service-catalog",
+        "cloneUrlSsh": "ssh://git-codecommit.eu-west-1.amazonaws.com/v1/repos/cdk-service-catalog",
+        "Arn": "arn:aws:codecommit:eu-west-1:703965850448:cdk-service-catalog"
+    }
+}
+(END)
+
+
