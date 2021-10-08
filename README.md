@@ -58,6 +58,23 @@ command.
 Enjoy!
 
 
+Prepare for deployment
+
+    export CDK_NEW_BOOTSTRAP=1
+    cdk bootstrap --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess aws://703965850448/eu-west-1
+
+Make sure, that cdk.json contains this .. 
+
+"@aws-cdk/core:newStyleStackSynthesis": true
+
+otherwise, you'll run into this: https://github.com/aws/aws-cdk/issues/9227
+
+    cdk deploy
+
+
+
+
+
 {
     "repositoryMetadata": {
         "accountId": "703965850448",
