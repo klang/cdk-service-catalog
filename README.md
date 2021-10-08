@@ -100,3 +100,14 @@ https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.pipelines/README.html#
 
 
 
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "cloudformation:GetTemplate",
+            "Resource": "arn:aws:cloudformation:*:703965850448:stack/*/*"
+        }
+    ]
+}
