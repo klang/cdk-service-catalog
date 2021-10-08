@@ -22,8 +22,7 @@ class PipelineStack(cdk.Stack):
                                              "cloudformation:DescribeChangeSet", 
                                              "cloudformation:ExecuteChangeSet", 
                                              "cloudformation:DescribeStackEvents"],
-                                    resources=["arn:aws:cloudformation:*:703965850448:stack/*/*"],
-                                    effect="Allow"
+                                    resources=["arn:aws:cloudformation:*:703965850448:stack/*/*"]
                                 )],                                                                 
                             input=CodePipelineSource.code_commit(repository,
                             branch="master",                     
