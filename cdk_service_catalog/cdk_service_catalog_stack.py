@@ -44,13 +44,13 @@ class CdkServiceCatalogStack(cdk.Stack):
         p2 = CloudFormationProduct(self, "AccountTrustRole", 
                                         owner="Conscia", 
                                         product_name="temporary-trusted-account", 
-                                        description="TemporaryAccountTrust to Conscia",
+                                        description="v1.0 - TemporaryAccountTrust to Conscia",
                                         product_versions=[p2v1])
                                         # product_versions=[p2v1, p2v2] would have been nice
         p21 = CloudFormationProduct(self, "AccountSpecificTrustRoleReadOnlyAccess", 
                                         owner="Conscia", 
                                         product_name="temporary-trusted-account-read-only", 
-                                        description="TemporaryAccountTrust to Conscia",
+                                        description="v1.1 - TemporaryAccountTrust to Conscia",
                                         product_versions=[p2v2])
                                         
         portfolio.add_product(p2)
