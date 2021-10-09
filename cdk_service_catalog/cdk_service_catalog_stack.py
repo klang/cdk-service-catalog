@@ -1,7 +1,10 @@
 from aws_cdk import core as cdk
+from aws_cdk.aws_iam import PrincipalPolicyFragment
 from aws_cdk.aws_s3_assets import Asset
-from aws_cdk.aws_s3 import Bucket
+from aws_cdk.aws_s3 import Bucket, CfnBucket
 from aws_cdk.aws_servicecatalog import CloudFormationTemplate, Portfolio, CloudFormationProduct, CloudFormationProductVersion, CfnCloudFormationProduct
+from aws_cdk.aws_servicecatalog import CfnCloudFormationProduct as cfnp
+from aws_cdk.aws_servicecatalog import CfnPortfolioProductAssociation
 
 # For consistency with other languages, `cdk` is the preferred import name for
 # the CDK's core module.  The following line also imports it as `core` for use
@@ -15,19 +18,13 @@ class CdkServiceCatalogStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        #bucket = Bucket(self, "ProductBucket", bucket_name="703965850448-cdk-service-catalog")
-#       AccountSpecificTrustRole.yaml
-#       AccountSpecificTrustRoleReadOnlyAccess.yaml
-#       MultiAccountTrustRole.yaml
-#       UserSpecificTrustRole.yaml
-#       simple-vpc-and-linux-instance-with-ssm-only.yaml
-#       simple-vpc-and-linux-instance-with-ssm.yaml
-#       simple-vpc-and-linux-instance.yaml
-# 
-    # asset = Asset(self, "UserSpecificTrustRole", path="./cdk_service_catalog/products/UserSpecificTrustRole.yaml")
+    
         portfolio = Portfolio(self, "Portfolio", description="Nice Helpers", display_name="Nice Helpers", provider_name="Conscia")
 
-        v1 = [CloudFormationProductVersion(product_version_name="v1.0", validate_template=False, cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/UserSpecificTrustRole.yaml"))]
+        # we could create a function or a class that does this, but seriously .. we already have a class hieracy that's supposed to handle this
+        v1 = [CloudFormationProductVersion(product_version_name="v1.0", 
+                                           validate_template=False, 
+                                           cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/UserSpecificTrustRole.yaml"))]
         p1 = CloudFormationProduct(self, "UserSpecificTrustRole", 
                                         owner="Conscia", 
                                         product_name="temporary-trusted-user", 
@@ -36,24 +33,11 @@ class CdkServiceCatalogStack(cdk.Stack):
                                         
         portfolio.add_product(p1)
 
-        # p2v1 = CfnCloudFormationProduct(self, "p2v1", 
-        #                                         name="temporary-trusted-accoutn", 
-        #                                         owner="Conscia", 
-        #                                         description="TemporaryAccountTrust to Conscia",
-        #                                         provisioning_artifact_parameters=[
-        #                                             CfnCloudFormationProduct.ProvisioningArtifactPropertiesProperty(name="v1.0",description="AdministratorAccess",disable_template_validation=False, info= {})
-        #                                         ])
-        # CfnCloudFormationProduct.ProvisioningArtifactPropertiesProperty.description
-
-
         #It's not yet possible to have two versions of a product
         # will result in 
         # jsii.errors.JSIIError: There is already a Construct with name 'Template' in CloudFormationProduct [AccountTrustRole]
         # also         
         #  the individual versions can not be assigned a description
-        #v2 = [CloudFormationProductVersion(product_version_name="v1.0", validate_template=False, cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/AccountSpecificTrustRole.yaml")),
-        #      #CloudFormationProductVersion(product_version_name="v1.1", validate_template=False, cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/AccountSpecificTrustRoleReadOnlyAccess.yaml")),
-        #]
         p2v1=CloudFormationProductVersion(product_version_name="v1.0", validate_template=False, cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/AccountSpecificTrustRole.yaml"))
         p2v2=CloudFormationProductVersion(product_version_name="v1.1", validate_template=False, cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/AccountSpecificTrustRoleReadOnlyAccess.yaml"))
        
@@ -72,5 +56,51 @@ class CdkServiceCatalogStack(cdk.Stack):
         portfolio.add_product(p2)
         portfolio.add_product(p21)
 
+        # it's not possible to make a product, with two versions in the way we would expect above, so we try it this way
+        # the following lines and p21 can be replaced by `product_versions=[p2v1, p2v2]` in the definition of p2, when
+        # CloudFormationProduct is adjusted to support more versions.
+        a1 = Asset(self, "AccountSpecificTrustRoleAsset", path="./cdk_service_catalog/products/AccountSpecificTrustRole.yaml")
+        a2 = Asset(self, "AccountSpecificTrustRoleReadOnlyAccessAsset", path="./cdk_service_catalog/products/AccountSpecificTrustRoleReadOnlyAccess.yaml")
+        
+        p3 = cdk.CfnResource(self, "p3", type="AWS::ServiceCatalog::CloudFormationProduct",
+                properties={"Name": "temporary-trusted-account",
+                            "Owner": "Conscia",
+                            "Description": "CfnResource - TemporaryAccountTrust to Conscia",
+                            "ProvisioningArtifactParameters": [
+                                {
+                                    "Description": "AdministratorAccess",
+                                    "DisableTemplateValidation": False,
+                                    "Name": "v1.0",
+                                    "Info": {"LoadTemplateFromURL": a1.http_url}
+                                },
+                                {
+                                    "Description": "ReadOnlyAccess",
+                                    "DisableTemplateValidation": False,
+                                    "Name": "v1.1",
+                                    "Info": {"LoadTemplateFromURL": a2.http_url}
+                                }
+                                ],
+                            }
+                    )
+        
+        
+        p3association = CfnPortfolioProductAssociation(self, "p3association", 
+            portfolio_id=portfolio.portfolio_id, product_id=p3.ref)
+
+        #portfolio.add_product(CloudFormationProduct.from_product_arn(self, "p3arn", p3.get_att("ProvisioningArtifactIds")))
 
 
+        v4 = [CloudFormationProductVersion(product_version_name="v1.0", 
+                                           validate_template=False, 
+                                           cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/MultiAccountTrustRole.yaml"))]
+        p4 = CloudFormationProduct(self, "MultiAccountTrustRole", 
+                                        owner="Conscia", 
+                                        product_name="temporary-trusted-accounts", 
+                                        description="TemporaryAccountTrust to several accounts",
+                                        product_versions=v4)
+                                        
+        portfolio.add_product(p4)
+
+#       simple-vpc-and-linux-instance-with-ssm-only.yaml
+#       simple-vpc-and-linux-instance-with-ssm.yaml
+#       simple-vpc-and-linux-instance.yaml
