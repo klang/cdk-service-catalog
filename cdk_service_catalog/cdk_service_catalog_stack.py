@@ -53,8 +53,8 @@ class CdkServiceCatalogStack(cdk.Stack):
                                         description="v1.1 - TemporaryAccountTrust to Conscia",
                                         product_versions=[p2v2])
                                         
-        portfolio.add_product(p2)
-        portfolio.add_product(p21)
+        #portfolio.add_product(p2)
+        #portfolio.add_product(p21)
 
         # it's not possible to make a product, with two versions in the way we would expect above, so we try it this way
         # the following lines and p21 can be replaced by `product_versions=[p2v1, p2v2]` in the definition of p2, when
@@ -65,7 +65,7 @@ class CdkServiceCatalogStack(cdk.Stack):
         p3 = cdk.CfnResource(self, "p3", type="AWS::ServiceCatalog::CloudFormationProduct",
                 properties={"Name": "temporary-trusted-account",
                             "Owner": "Conscia",
-                            "Description": "CfnResource - TemporaryAccountTrust to Conscia",
+                            "Description": "TemporaryAccountTrust to Conscia",
                             "ProvisioningArtifactParameters": [
                                 {
                                     "Description": "AdministratorAccess",
@@ -101,6 +101,37 @@ class CdkServiceCatalogStack(cdk.Stack):
                                         
         portfolio.add_product(p4)
 
-#       simple-vpc-and-linux-instance-with-ssm-only.yaml
-#       simple-vpc-and-linux-instance-with-ssm.yaml
-#       simple-vpc-and-linux-instance.yaml
+        asset1 = Asset(self, "vpc-and-linux", path="./cdk_service_catalog/products/simple-vpc-and-linux-instance.yaml")
+        asset2 = Asset(self, "vpc-and-linux-ssm", path="./cdk_service_catalog/products/simple-vpc-and-linux-instance-with-ssm.yaml")
+        asset3 = Asset(self, "vpc-and-linux-ssm-only", path="./cdk_service_catalog/products/simple-vpc-and-linux-instance-with-ssm-only.yaml")
+        p5 = cdk.CfnResource(self, "p5", type="AWS::ServiceCatalog::CloudFormationProduct",
+                properties={"Name": "vpc-and-linux",
+                            "Owner": "Conscia",
+                            "Description": "Simple VPC with Linux instance",
+                            "ProvisioningArtifactParameters": [
+                                {
+                                    "Description": "VPC with Linux with public ssh access",
+                                    "DisableTemplateValidation": False,
+                                    "Name": "v1.0",
+                                    "Info": {"LoadTemplateFromURL": asset1.http_url}
+                                },
+                                {
+                                    "Description": "VPC with Linux with access through ssm",
+                                    "DisableTemplateValidation": False,
+                                    "Name": "v1.1",
+                                    "Info": {"LoadTemplateFromURL": asset2.http_url}
+                                },
+                                {
+                                    "Description": "VPC with Linux with access through ssm only",
+                                    "DisableTemplateValidation": False,
+                                    "Name": "v1.2",
+                                    "Info": {"LoadTemplateFromURL": asset3.http_url}
+                                }
+                                ],
+                            }
+                    )
+        
+        
+        p5association = CfnPortfolioProductAssociation(self, "p5association", 
+            portfolio_id=portfolio.portfolio_id, product_id=p5.ref)
+        
