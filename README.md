@@ -57,8 +57,24 @@ command.
 
 Enjoy!
 
+# repository
+
+    awsume training
+    git clone git@github.com:dashsoftaps/cdk-service-catalog.git
+    aws codecommit create-repository --repository-name cdk-service-catalog 
+    cd cdk-service-catalog
+    git remote add training codecommit::eu-west-1://cdk-service-catalog
+    git push training
 
 Prepare for deployment
+
+Change the account number to your own
+
+    (.venv) ➜  cdk-service-catalog git:(master) ✗ find . -name '*.py' | xargs grep 703965850448 2>/dev/null
+    ./app.py:    env=cdk.Environment(account="703965850448", region="eu-west-1")
+    ./app.py:    env=core.Environment(account='703965850448', region='eu-west-1'),
+
+bootstrap
 
     export CDK_NEW_BOOTSTRAP=1
     cdk bootstrap --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess aws://703965850448/eu-west-1
@@ -70,61 +86,3 @@ Make sure, that cdk.json contains this ..
 otherwise, you'll run into this: https://github.com/aws/aws-cdk/issues/9227
 
     cdk deploy
-
-
-
-
-
-{
-    "repositoryMetadata": {
-        "accountId": "703965850448",
-        "repositoryId": "3e5e1326-cae6-43e5-b444-a69270e0aa94",
-        "repositoryName": "cdk-service-catalog",
-        "lastModifiedDate": "2021-10-07T16:13:19.347000+02:00",
-        "creationDate": "2021-10-07T16:13:19.347000+02:00",
-        "cloneUrlHttp": "https://git-codecommit.eu-west-1.amazonaws.com/v1/repos/cdk-service-catalog",
-        "cloneUrlSsh": "ssh://git-codecommit.eu-west-1.amazonaws.com/v1/repos/cdk-service-catalog",
-        "Arn": "arn:aws:codecommit:eu-west-1:703965850448:cdk-service-catalog"
-    }
-}
-(END)
-
-
-# trust
-
-https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.pipelines/README.html#context-lookups
-
-    cdk bootstrap --trust-for-lookup=703965850448
-    
-    export CDK_NEW_BOOTSTRAP=1
-    cdk bootstrap --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess aws://703965850448/eu-west-1
-
-        pipeline =  CodePipeline(self, "Pipeline", 
-                        pipeline_name="ServiceCatalog",
-                        synth=CodeBuildStep("Synth",                                     
-                            #input=CodePipelineSource.git_hub("klang/cdk-service-catalog", "master"),
-                            input=CodePipelineSource.code_commit(repository=Repository.from_repository_name(self, id="repository", repository_name="cdk-service-catalog"),
-                            branch="master",
-                            
-                            code_build_clone_output=True),
-                            commands=["npm install -g aws-cdk", 
-                                "python -m pip install -r requirements.txt", 
-                                "cdk synth"]
-                        )
-                    )
-
-
-
-
-
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "VisualEditor0",
-            "Effect": "Allow",
-            "Action": "cloudformation:GetTemplate",
-            "Resource": "arn:aws:cloudformation:*:703965850448:stack/*/*"
-        }
-    ]
-}

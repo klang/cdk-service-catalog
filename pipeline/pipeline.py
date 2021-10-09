@@ -13,18 +13,7 @@ class PipelineStack(cdk.Stack):
 
         pipeline =  CodePipeline(self, "Pipeline", 
                         pipeline_name="ServiceCatalog",
-                        synth=CodeBuildStep("Synth",
- #                           role_policy_statements=[
- #                               iam.PolicyStatement(
- #                                   actions=["cloudformation:GetTemplate", 
- #                                            "cloudformation:DeleteChangeSet", 
- #                                            "cloudformation:CreateChangeSet",
- #                                            "cloudformation:DescribeChangeSet", 
- #                                            "cloudformation:ExecuteChangeSet", 
- #                                            "cloudformation:DescribeStackEvents"],
- #                                   resources=["arn:aws:cloudformation:*:703965850448:stack/*/*"],
- #                                   effect=iam.Effect.ALLOW
- #                               )],                                                                 
+                        synth=CodeBuildStep("Synth",                                                               
                             input=CodePipelineSource.code_commit(repository,
                             branch="master",                     
                             code_build_clone_output=True),
