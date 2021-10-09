@@ -38,9 +38,9 @@ class CdkServiceCatalogStack(cdk.Stack):
         # jsii.errors.JSIIError: There is already a Construct with name 'Template' in CloudFormationProduct [AccountTrustRole]
         # also         
         #  the individual versions can not be assigned a description
-        p2v1=CloudFormationProductVersion(product_version_name="v1.0", validate_template=False, cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/AccountSpecificTrustRole.yaml"))
-        p2v2=CloudFormationProductVersion(product_version_name="v1.1", validate_template=False, cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/AccountSpecificTrustRoleReadOnlyAccess.yaml"))
-       
+        p2v1=CloudFormationProductVersion(product_version_name="v1.0", description="AdministratorAccess", validate_template=False, cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/AccountSpecificTrustRole.yaml"))
+        p2v2=CloudFormationProductVersion(product_version_name="v1.1", description="ReadOnlyAccess", validate_template=False, cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/AccountSpecificTrustRoleReadOnlyAccess.yaml"))
+
         p2 = CloudFormationProduct(self, "AccountTrustRole", 
                                         owner="Conscia", 
                                         product_name="temporary-trusted-account", 
