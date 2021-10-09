@@ -1,0 +1,114 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  Portfolio for nifty little tricks that are nice to have in an account.
+
+Parameters:
+  S3Bucket:
+    Type: String
+    Description: S3Bucket where Service Catalog Products templates are present
+    Default: account-id-service-catalog-products
+
+Resources:
+  Portfolio:
+    Type: "AWS::ServiceCatalog::Portfolio"
+    Properties:
+      AcceptLanguage: en
+      Description: "Portfolio of small products that can help in a DevOps relationship"
+      DisplayName: "DevOps Helpers"
+      ProviderName: "Conscia"
+
+  ProductAccountTrustPortfolio:
+    Type: AWS::ServiceCatalog::PortfolioProductAssociation
+    Properties:
+      AcceptLanguage: en
+      PortfolioId: !Ref Portfolio
+      ProductId: !Ref ProductAccountTrust
+
+  ProductAccountTrust:
+    Type: "AWS::ServiceCatalog::CloudFormationProduct"
+    Properties:
+      Description: "TemporaryAccountTrust to Conscia"
+      Name: "temporary-trusted-account"
+      Owner: "Conscia"
+      ProvisioningArtifactParameters:
+        - Description: "AdministratorAccess"
+          DisableTemplateValidation: false
+          Name: "v1.0"
+          Info:
+            LoadTemplateFromURL: !Sub "https://s3-${AWS::Region}.amazonaws.com/${S3Bucket}/AccountSpecificTrustRole.yaml"
+        - Description: "ReadOnlyAccess"
+          DisableTemplateValidation: false
+          Name: "v1.1"
+          Info:
+            LoadTemplateFromURL: !Sub "https://s3-${AWS::Region}.amazonaws.com/${S3Bucket}/AccountSpecificTrustRoleReadOnlyAccess.yaml"
+
+  ProductUserTrustPortfolio:
+    Type: AWS::ServiceCatalog::PortfolioProductAssociation
+    Properties:
+      AcceptLanguage: en
+      PortfolioId: !Ref Portfolio
+      ProductId: !Ref ProductUserTrust
+
+  ProductUserTrust:
+    Type: "AWS::ServiceCatalog::CloudFormationProduct"
+    Properties:
+      Description: "TemporaryUserTrust to Conscia"
+      Name: "temporary-trusted-user"
+      Owner: "Conscia"
+      ProvisioningArtifactParameters:
+        - Description: "AdministratorAccess"
+          DisableTemplateValidation: false
+          Name: "v1.0"
+          Info:
+            LoadTemplateFromURL: !Sub "https://s3-${AWS::Region}.amazonaws.com/${S3Bucket}/UserSpecificTrustRole.yaml"
+
+  ProductMultiAccountTrustPortfolio:
+    Type: AWS::ServiceCatalog::PortfolioProductAssociation
+    Properties:
+      AcceptLanguage: en
+      PortfolioId: !Ref Portfolio
+      ProductId: !Ref ProductMultiAccountTrust
+
+  ProductMultiAccountTrust:
+    Type: "AWS::ServiceCatalog::CloudFormationProduct"
+    Properties:
+      Description: "TemporaryMultiAccountTrust to a list of accounts"
+      Name: "temporary-trusted-accounts"
+      Owner: "Conscia"
+      ProvisioningArtifactParameters:
+        - Description: "AdministratorAccess"
+          DisableTemplateValidation: false
+          Name: "v1.0"
+          Info:
+            LoadTemplateFromURL: !Sub "https://s3-${AWS::Region}.amazonaws.com/${S3Bucket}/MultiAccountTrustRole.yaml"
+
+
+  ProductVPCANDLinuxInstancePortfolio:
+    Type: AWS::ServiceCatalog::PortfolioProductAssociation
+    Properties:
+      AcceptLanguage: en
+      PortfolioId: !Ref Portfolio
+      ProductId: !Ref ProductVPCANDLinuxInstance
+
+  ProductVPCANDLinuxInstance:
+    Type: "AWS::ServiceCatalog::CloudFormationProduct"
+    Properties:
+      Description: "Simple VPC with Linux instance"
+      Name: "vpc-and-linux"
+      Owner: "Conscia"
+      ProvisioningArtifactParameters:
+        - Description: "VPC with Linux with public ssh access"
+          DisableTemplateValidation: false
+          Name: "v1.0"
+          Info:
+            LoadTemplateFromURL: !Sub "https://s3-${AWS::Region}.amazonaws.com/${S3Bucket}/simple-vpc-and-linux-instance.yaml"
+        - Description: "VPC with Linux with access through ssm"
+          DisableTemplateValidation: false
+          Name: "v1.1"
+          Info:
+            LoadTemplateFromURL: !Sub "https://s3-${AWS::Region}.amazonaws.com/${S3Bucket}/simple-vpc-and-linux-instance-with-ssm.yaml"
+        - Description: "VPC with Linux with access through ssm only"
+          DisableTemplateValidation: false
+          Name: "v1.2"
+          Info:
+            LoadTemplateFromURL: !Sub "https://s3-${AWS::Region}.amazonaws.com/${S3Bucket}/simple-vpc-and-linux-instance-with-ssm-only.yaml"
