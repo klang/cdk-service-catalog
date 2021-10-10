@@ -66,18 +66,13 @@ Enjoy!
     git remote add training codecommit::eu-west-1://cdk-service-catalog
     git push training
 
-Prepare for deployment
-
-Change the account number to your own
-
-    (.venv) ➜  cdk-service-catalog git:(master) ✗ find . -name '*.py' | xargs grep 703965850448 2>/dev/null
-    ./app.py:    env=cdk.Environment(account="703965850448", region="eu-west-1")
-    ./app.py:    env=core.Environment(account='703965850448', region='eu-west-1'),
+# Prepare for deployment
 
 bootstrap
+    export account_id=$(aws sts get-caller-identity --query Account --output text)
 
     export CDK_NEW_BOOTSTRAP=1
-    cdk bootstrap --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess aws://703965850448/eu-west-1
+    cdk bootstrap --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess aws://$account_id/eu-west-1
 
 Make sure, that cdk.json contains this .. 
 

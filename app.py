@@ -13,9 +13,7 @@ from cdk_service_catalog.cdk_service_catalog_stack import CdkServiceCatalogStack
 from pipeline.pipeline import PipelineStack
 
 app = core.App()
-PipelineStack(app, "PipelineStack", 
-    env=cdk.Environment(account="703965850448", region="eu-west-1")
-)
+PipelineStack(app, "PipelineStack")
 
 CdkServiceCatalogStack(app, "CdkServiceCatalogStack",
     # If you don't specify 'env', this stack will be environment-agnostic.
@@ -30,7 +28,7 @@ CdkServiceCatalogStack(app, "CdkServiceCatalogStack",
     # Uncomment the next line if you know exactly what Account and Region you
     # want to deploy the stack to. */
 
-    env=core.Environment(account='703965850448', region='eu-west-1'),
+    #env=core.Environment(account='ACCOUNT', region='REGION'),
 
     # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
     )
