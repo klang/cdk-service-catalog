@@ -11,6 +11,7 @@ from aws_cdk import core
 
 from cdk_service_catalog.cdk_service_catalog_stack import CdkServiceCatalogStack
 from pipeline.pipeline import PipelineStack
+from example.service_catalog import ServiceCatalogStack
 
 app = core.App()
 PipelineStack(app, "PipelineStack")
@@ -32,5 +33,5 @@ CdkServiceCatalogStack(app, "CdkServiceCatalogStack",
 
     # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
     )
-
+ServiceCatalogStack(app, "ServiceCatalogStack")
 app.synth()

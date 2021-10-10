@@ -1,0 +1,20 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Loopback role
+Resources:
+  LoopbackRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: temporary-trusted-account
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Sid: ''
+        Version: '2012-10-17'
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AWSSupportAccess
