@@ -68,16 +68,18 @@ Enjoy!
 
 # Prepare for deployment
 
-bootstrap
-    export account_id=$(aws sts get-caller-identity --query Account --output text)
+## bootstrap
 
+    export account_id=$(aws sts get-caller-identity --query Account --output text)
     export CDK_NEW_BOOTSTRAP=1
     cdk bootstrap --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess aws://$account_id/eu-west-1
 
 Make sure, that cdk.json contains this .. 
 
-"@aws-cdk/core:newStyleStackSynthesis": true
+    "@aws-cdk/core:newStyleStackSynthesis": true
 
 otherwise, you'll run into this: https://github.com/aws/aws-cdk/issues/9227
 
-    cdk deploy
+    cdk synth
+    cdk deploy PipelineStack
+    cdk deploy CdkServiceCatalogStack
