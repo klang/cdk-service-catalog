@@ -98,7 +98,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId: !Ref VPC
-      GroupDescription: http-access-form-everywhere
+      GroupDescription: http-access-from-everywhere
       SecurityGroupEgress:
         - CidrIp:     0.0.0.0/0
           IpProtocol: "-1"
@@ -111,6 +111,7 @@ Resources:
     Type: "AWS::EC2::Instance"
     Properties:
       # this instance has ssm installed out of the box
+      # aws ec2 describe-images --owners 099720109477 --filters "Name=name,Values=ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*" --query 'sort_by(Images,&CreationDate)[-1].ImageId' --region eu-west-1
       ImageId: "ami-02df9ea15c1778c9c"
       KeyName: !Ref KeyName
       IamInstanceProfile: !Ref SSMInstanceProfile
