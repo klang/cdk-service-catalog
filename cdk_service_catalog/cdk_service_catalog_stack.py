@@ -1,10 +1,5 @@
 import aws_cdk as cdk
-from aws_cdk.aws_iam import PrincipalPolicyFragment
-from aws_cdk.aws_s3_assets import Asset
-from aws_cdk.aws_s3 import Bucket, CfnBucket
-from aws_cdk.aws_servicecatalog import CloudFormationTemplate, Portfolio, CloudFormationProduct, CloudFormationProductVersion, CfnCloudFormationProduct
-from aws_cdk.aws_servicecatalog import CfnCloudFormationProduct as cfnp
-from aws_cdk.aws_servicecatalog import CfnPortfolioProductAssociation
+from aws_cdk.aws_servicecatalog import CloudFormationTemplate, Portfolio, CloudFormationProduct, CloudFormationProductVersion
 
 from constructs import Construct
 
@@ -28,62 +23,16 @@ class CdkServiceCatalogStack(cdk.Stack):
                                         
         portfolio.add_product(p1)
 
-        #It's not yet possible to have two versions of a product
-        # will result in 
-        # jsii.errors.JSIIError: There is already a Construct with name 'Template' in CloudFormationProduct [AccountTrustRole]
-        # also         
-        #  the individual versions can not be assigned a description
         p2v1=CloudFormationProductVersion(product_version_name="v1.0", description="AdministratorAccess", validate_template=False, cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/AccountSpecificTrustRole.yaml"))
         p2v2=CloudFormationProductVersion(product_version_name="v1.1", description="ReadOnlyAccess", validate_template=False, cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/AccountSpecificTrustRoleReadOnlyAccess.yaml"))
 
         p2 = CloudFormationProduct(self, "AccountTrustRole", 
                                         owner="Conscia", 
                                         product_name="temporary-trusted-account", 
-                                        description="v1.0 - TemporaryAccountTrust to Conscia",
-                                        product_versions=[p2v1])
-                                        # product_versions=[p2v1, p2v2] would have been nice
-        p21 = CloudFormationProduct(self, "AccountSpecificTrustRoleReadOnlyAccess", 
-                                        owner="Conscia", 
-                                        product_name="temporary-trusted-account-read-only", 
-                                        description="v1.1 - TemporaryAccountTrust to Conscia",
-                                        product_versions=[p2v2])
+                                        description="TemporaryAccountTrust to Conscia - either ReadOnlyAccess or AdministratorAccess",
+                                        product_versions=[p2v1, p2v2])
                                         
-        #portfolio.add_product(p2)
-        #portfolio.add_product(p21)
-
-        # it's not possible to make a product, with two versions in the way we would expect above, so we try it this way
-        # the following lines and p21 can be replaced by `product_versions=[p2v1, p2v2]` in the definition of p2, when
-        # CloudFormationProduct is adjusted to support more versions.
-        a1 = Asset(self, "AccountSpecificTrustRoleAsset", path="./cdk_service_catalog/products/AccountSpecificTrustRole.yaml")
-        a2 = Asset(self, "AccountSpecificTrustRoleReadOnlyAccessAsset", path="./cdk_service_catalog/products/AccountSpecificTrustRoleReadOnlyAccess.yaml")
-        
-        p3 = cdk.CfnResource(self, "p3", type="AWS::ServiceCatalog::CloudFormationProduct",
-                properties={"Name": "temporary-trusted-account",
-                            "Owner": "Conscia",
-                            "Description": "TemporaryAccountTrust to Conscia",
-                            "ProvisioningArtifactParameters": [
-                                {
-                                    "Description": "AdministratorAccess",
-                                    "DisableTemplateValidation": False,
-                                    "Name": "v1.0",
-                                    "Info": {"LoadTemplateFromURL": a1.http_url}
-                                },
-                                {
-                                    "Description": "ReadOnlyAccess",
-                                    "DisableTemplateValidation": False,
-                                    "Name": "v1.1",
-                                    "Info": {"LoadTemplateFromURL": a2.http_url}
-                                }
-                                ],
-                            }
-                    )
-        
-        
-        p3association = CfnPortfolioProductAssociation(self, "p3association", 
-            portfolio_id=portfolio.portfolio_id, product_id=p3.ref)
-
-        #portfolio.add_product(CloudFormationProduct.from_product_arn(self, "p3arn", p3.get_att("ProvisioningArtifactIds")))
-
+        portfolio.add_product(p2)
 
         v4 = [CloudFormationProductVersion(product_version_name="v1.0", 
                                            validate_template=False, 
@@ -96,37 +45,13 @@ class CdkServiceCatalogStack(cdk.Stack):
                                         
         portfolio.add_product(p4)
 
-        asset1 = Asset(self, "vpc-and-linux", path="./cdk_service_catalog/products/simple-vpc-and-linux-instance.yaml")
-        asset2 = Asset(self, "vpc-and-linux-ssm", path="./cdk_service_catalog/products/simple-vpc-and-linux-instance-with-ssm.yaml")
-        asset3 = Asset(self, "vpc-and-linux-ssm-only", path="./cdk_service_catalog/products/simple-vpc-and-linux-instance-with-ssm-only.yaml")
-        p5 = cdk.CfnResource(self, "p5", type="AWS::ServiceCatalog::CloudFormationProduct",
-                properties={"Name": "vpc-and-linux",
-                            "Owner": "Conscia",
-                            "Description": "Simple VPC with Linux instance",
-                            "ProvisioningArtifactParameters": [
-                                {
-                                    "Description": "VPC with Linux with public ssh access",
-                                    "DisableTemplateValidation": False,
-                                    "Name": "v1.0",
-                                    "Info": {"LoadTemplateFromURL": asset1.http_url}
-                                },
-                                {
-                                    "Description": "VPC with Linux with access through ssm",
-                                    "DisableTemplateValidation": False,
-                                    "Name": "v1.1",
-                                    "Info": {"LoadTemplateFromURL": asset2.http_url}
-                                },
-                                {
-                                    "Description": "VPC with Linux with access through ssm only",
-                                    "DisableTemplateValidation": False,
-                                    "Name": "v1.2",
-                                    "Info": {"LoadTemplateFromURL": asset3.http_url}
-                                }
-                                ],
-                            }
-                    )
-        
-        
-        p5association = CfnPortfolioProductAssociation(self, "p5association", 
-            portfolio_id=portfolio.portfolio_id, product_id=p5.ref)
-        
+        p5v1=CloudFormationProductVersion(product_version_name="v1.0", description="VPC with Linux with public ssh access", validate_template=False, cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/simple-vpc-and-linux-instance.yaml"))
+        p5v2=CloudFormationProductVersion(product_version_name="v1.1", description="VPC with Linux with access through ssm", validate_template=False, cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/simple-vpc-and-linux-instance-with-ssm.yaml"))
+        p5v3=CloudFormationProductVersion(product_version_name="v1.2", description="VPC with Linux with access through ssm only", validate_template=False, cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/simple-vpc-and-linux-instance-with-ssm-only.yaml"))
+
+        p5 = CloudFormationProduct(self, "VPCandLinux",
+                                owner="Conscia",
+                                product_name="simple-vpc-and-linux",
+                                description="Simple VPC with Linux instance",
+                                product_versions=[p5v1, p5v2, p5v3])
+        portfolio.add_product(p5)
