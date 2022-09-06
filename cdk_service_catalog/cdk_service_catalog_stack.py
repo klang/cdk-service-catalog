@@ -55,3 +55,12 @@ class CdkServiceCatalogStack(cdk.Stack):
                                 description="Simple VPC with Linux instance",
                                 product_versions=[p5v1, p5v2, p5v3])
         portfolio.add_product(p5)
+
+        # https://cloudpartners.atlassian.net/wiki/spaces/DEV/pages/1964572677/billing+alarm
+        p6v1=CloudFormationProductVersion(product_version_name="v1.0", description="Training Budget", validate_template=False, cloud_formation_template=CloudFormationTemplate.from_asset(path="./cdk_service_catalog/products/TrainingCostBudget.yaml"))
+        p6 = CloudFormationProduct(self, "TrainingBudget",
+                                owner="Conscia",
+                                product_name="training-budget",
+                                description="Training Budget with notifications at $5,$10,$25 and $45 for individual developer accounts.",
+                                product_versions=[p6v1])
+        portfolio.add_product(p6)
