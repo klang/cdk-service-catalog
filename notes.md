@@ -161,3 +161,20 @@ Verify that it's been done
     awsume shared-services
     aws servicecatalog create-portfolio-share --portfolio-id $portfolio  --organization-node Type=ORGANIZATION,Value=$oid
 
+
+
+# aws-cli manipulations
+
+awsume training
+account=$(aws sts get-caller-identity --query=Account --output text)
+
+awsume controltower
+aws organizations describe-account --account-id $account
+
+
+aws organizations list-roots --query 'Roots[*].Id' --output text
+root=$(aws organizations list-roots --query 'Roots[*].Id' --output text)
+
+aws organizations list-organizational-units-for-parent --parent-id $root
+
+aws organizations list-organizational-units-for-parent --parent-id $root --query 'OrganizationalUnits[*].[Id,Name]' --output text

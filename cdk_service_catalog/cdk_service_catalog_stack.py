@@ -2,6 +2,7 @@ import aws_cdk as cdk
 from aws_cdk.aws_servicecatalog import CloudFormationTemplate, Portfolio, CloudFormationProduct, CloudFormationProductVersion
 
 from constructs import Construct
+from .products.s3_bucket_product import S3BucketProduct
 
 class CdkServiceCatalogStack(cdk.Stack):
 
@@ -64,3 +65,9 @@ class CdkServiceCatalogStack(cdk.Stack):
                                 description="Training Budget with notifications at $5,$10,$25 and $45 for individual developer accounts.",
                                 product_versions=[p6v1])
         portfolio.add_product(p6)
+
+        p7v1=CloudFormationProductVersion(product_version_name="v1.0", description="S3 Budget", validate_template=False, 
+            cloud_formation_template=CloudFormationTemplate.from_product_stack(S3BucketProduct(self, "S3BucketProduct")))
+
+        p7 = CloudFormationProduct(self, "Product",owner="Conscia", product_name="S3 Bucket", product_versions=[p7v1])
+        portfolio.add_product(p7)
